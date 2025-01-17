@@ -70,3 +70,5 @@ if st.button('Predict', key='predict', help="Click to predict if the SMS is spam
 
 # Display the watermark
 st.markdown('<div class="watermark" style="color: #bbb; font-style: italic; opacity: 0.5; font-size: 14px;">Created by Gurudeep Soni 💻</div>', unsafe_allow_html=True)
+
+#final file
