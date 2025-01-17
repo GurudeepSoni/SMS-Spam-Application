@@ -2,12 +2,16 @@ import streamlit as st
 import pickle
 import string
 import nltk
+import os
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
 
-# Downloading NLTK data
-nltk.download('punkt')
-nltk.download('stopwords')
+# Check and download required NLTK data if not already downloaded
+if not os.path.exists(os.path.join(nltk.data.find("corpora"), 'stopwords')):
+    nltk.download('stopwords')
+
+if not os.path.exists(os.path.join(nltk.data.find("tokenizers"), 'punkt')):
+    nltk.download('punkt')
 
 # Initialize the PorterStemmer
 ps = PorterStemmer()
@@ -17,30 +21,24 @@ def transform_text(text):
     text = text.lower()
     text = nltk.word_tokenize(text)
 
-    y = []
-    for i in text:
-        if i.isalnum():
-            y.append(i)
+    # Retrieve stopwords only once
+    stop_words = set(stopwords.words('english'))
 
-    text = y[:]
-    y.clear()
+    # Token filtering
+    text = [i for i in text if i.isalnum() and i not in stop_words and i not in string.punctuation]
 
-    for i in text:
-        if i not in stopwords.words('english') and i not in string.punctuation:
-            y.append(i)
+    # Stemming
+    text = [ps.stem(i) for i in text]
 
-    text = y[:]
-    y.clear()
-
-    for i in text:
-        y.append(ps.stem(i))
-
-    return " ".join(y)
-
+    return " ".join(text)
 
 # Load the vectorizer and model
-tk = pickle.load(open("vectorizer.pkl", 'rb'))
-model = pickle.load(open("model.pkl", 'rb'))
+try:
+    tk = pickle.load(open("vectorizer.pkl", 'rb'))
+    model = pickle.load(open("model.pkl", 'rb'))
+except FileNotFoundError:
+    st.error("Model or vectorizer file not found. Please check the file paths.")
+    st.stop()  # This will stop further execution
 
 # Title and description with custom HTML and CSS
 st.markdown("""
@@ -56,20 +54,23 @@ input_sms = st.text_input("Enter the SMS", key="sms", help="Type your message he
 
 # Add a button to predict
 if st.button('Predict', key='predict', help="Click to predict if the SMS is spam or not"):
-    # Preprocess the SMS input
-    transformed_sms = transform_text(input_sms)
-
-    # Vectorize the input
-    vector_input = tk.transform([transformed_sms])
-
-    # Predict the result
-    result = model.predict(vector_input)[0]
-    
-    # Display result
-    if result == 1:
-        st.markdown('<div class="result" style="color: red;">Spam</div>', unsafe_allow_html=True)
+    if input_sms.strip() == "":
+        st.warning("Please enter an SMS to classify.")
     else:
-        st.markdown('<div class="result" style="color: green;">Not Spam</div>', unsafe_allow_html=True)
+        # Preprocess the SMS input
+        transformed_sms = transform_text(input_sms)
+
+        # Vectorize the input
+        vector_input = tk.transform([transformed_sms])
+
+        # Predict the result
+        result = model.predict(vector_input)[0]
+
+        # Display result
+        if result == 1:
+            st.markdown('<div class="result" style="color: red;">Spam</div>', unsafe_allow_html=True)
+        else:
+            st.markdown('<div class="result" style="color: green;">Not Spam</div>', unsafe_allow_html=True)
 
 # Display the watermark
 st.markdown('<div class="watermark" style="color: #bbb; font-style: italic; opacity: 0.5; font-size: 14px;">Created by Gurudeep Soni 💻</div>', unsafe_allow_html=True)
