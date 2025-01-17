@@ -2,16 +2,12 @@ import streamlit as st
 import pickle
 import string
 import nltk
-import os
 from nltk.corpus import stopwords
 from nltk.stem.porter import PorterStemmer
 
-# Check and download required NLTK data if not already downloaded
-if not os.path.exists(os.path.join(nltk.data.find("corpora"), 'stopwords')):
-    nltk.download('stopwords')
-
-if not os.path.exists(os.path.join(nltk.data.find("tokenizers"), 'punkt')):
-    nltk.download('punkt')
+# Ensure necessary NLTK data is downloaded
+nltk.download('stopwords')
+nltk.download('punkt')
 
 # Initialize the PorterStemmer
 ps = PorterStemmer()
@@ -24,10 +20,10 @@ def transform_text(text):
     # Retrieve stopwords only once
     stop_words = set(stopwords.words('english'))
 
-    # Token filtering
+    # Token filtering: Remove non-alphanumeric words, stopwords, and punctuation
     text = [i for i in text if i.isalnum() and i not in stop_words and i not in string.punctuation]
 
-    # Stemming
+    # Stemming: Apply stemming to each word
     text = [ps.stem(i) for i in text]
 
     return " ".join(text)
@@ -38,7 +34,7 @@ try:
     model = pickle.load(open("model.pkl", 'rb'))
 except FileNotFoundError:
     st.error("Model or vectorizer file not found. Please check the file paths.")
-    st.stop()  # This will stop further execution
+    st.stop()  # Stop further execution if files are not found
 
 # Title and description with custom HTML and CSS
 st.markdown("""
