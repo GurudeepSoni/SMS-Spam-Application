@@ -19,7 +19,7 @@ SMS Spam Detection is a machine learning model that takes an SMS as input and pr
 
 ### Data Collection
 The SMS Spam Collection dataset was collected from Kaggle, which contains over 5,500 SMS messages labeled as either spam or not spam.
-You can access the dataset from [here](https://gurudeep-sms-spam-application.streamlit.app/)
+You can access the dataset from [here]()
 
 ### Data Cleaning and Preprocessing
 The data was cleaned by handling null and duplicate values, and the "type" column was label-encoded. The data was then preprocessed by converting the text into tokens, removing special characters, stop words and punctuation, and stemming the data. The data was also converted to lowercase before preprocessing.
@@ -34,7 +34,7 @@ Multiple classifier models were tried, including NaiveBayes, random forest, KNN,
 The model was deployed on the web using Streamlit. The user interface has a simple input box where the user can input a message, and the model will predict whether it is spam or not spam.
 
 ## Demo
-To try out the SMS Spam Detection model, visit [here](https://textsafe.streamlit.app/).
+To try out the SMS Spam Detection model, visit [here](https://gurudeep-sms-spam-application.streamlit.app/).
 
 ## Usage
 To use the SMS Spam Detection model on your own machine, follow these steps:
